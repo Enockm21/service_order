@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "developement" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "developement" ]
 
 jobs:
   build:
@@ -13,14 +13,14 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.10, 3.11]
 
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.10" 
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
@@ -28,3 +28,19 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test
+    - name: Run Migrations
+      if: success()  # Ensure migrations run only if tests pass
+      run: |
+        python manage.py migrate --noinput
+
+    - name: Deploy to main if tests pass 
+      if: success()  # Ensure deployment only runs if tests and migrations succeed ok
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git fetch origin main  # Fetch main branch from origin
+        git checkout main
+        git merge --allow-unrelated-histories dev # Allow merging unrelated histories
+        git push origin main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
