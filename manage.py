@@ -3,6 +3,12 @@
 import os
 import sys
 
+# In manage.py
+from django.core.management import execute_from_command_line
+from order.service_order import start_consumer_thread  # Import the consumer
+
+    # Start the RabbitMQ consumer in a background thread
+   
 
 def main():
     """Run administrative tasks."""
@@ -20,3 +26,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    start_consumer_thread()
+
+    execute_from_command_line(sys.argv)
