@@ -64,9 +64,3 @@ class OrderSerializer(serializers.ModelSerializer):
             )
 
         return order
-# class OrderSerializer(serializers.ModelSerializer):
-#     products = OrderProductSerializer(many=True, read_only=True, source='orderproduct_set')
-
-#     class Meta:
-#         model = Order
-#         fields = '__all__'
